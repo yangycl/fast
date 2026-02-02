@@ -10,6 +10,12 @@ class Token {
 }
 class TokenIzer {
     code;
+    static keyWordList = [
+        "while",
+        "if",
+        "el",
+        "eif",
+    ];
     pos = 0;
     currentChar = "";
     constructor(code) {
@@ -33,6 +39,9 @@ class TokenIzer {
         while (/[a-zA-Z]/.test(this.currentChar)) {
             result += this.currentChar;
             this.advance();
+        }
+        if (TokenIzer.keyWordList.includes(result)) {
+            return new Token("keyWord", result);
         }
         return new Token("identifierValue", result);
     }

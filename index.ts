@@ -3,6 +3,13 @@ class Token {
 }
 
 class TokenIzer {
+    static keyWordList = [
+        "while",
+        "if", 
+        "el",
+        "eif",
+    ]
+
     public pos: number = 0
     public currentChar: string = ""
 
@@ -29,6 +36,9 @@ class TokenIzer {
         while (/[a-zA-Z]/.test(this.currentChar)) {
             result += this.currentChar
             this.advance()
+        }
+        if (TokenIzer.keyWordList.includes(result)) {
+            return new Token("keyWord", result)
         }
         return new Token("identifierValue", result)
     }
