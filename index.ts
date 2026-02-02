@@ -10,16 +10,32 @@ class TokenIzer {
         "eif",
     ]
 
+    static conditionOperation = [
+        "==",
+        "!=",
+        "<=",
+        ">="
+    ]
+
     public pos: number = 0
     public currentChar: string = ""
+    public twoChar: string = "" 
+
+    get nextChar() {
+        return this.code[this.pos + 1] ?? ""
+    }
 
     constructor(public code: string) {
         this.currentChar = code[0] ?? ""
+        this.twoChar = this.currentChar + this.nextChar;
     }
 
+
+    
     advance(): void {
         this.pos++
         this.currentChar = this.code[this.pos] ?? ""
+        this.twoChar = this.currentChar + this.nextChar;
     }
 
     private number(): Token {
@@ -59,6 +75,11 @@ class TokenIzer {
 
     private operator(): Token {
         const op = this.currentChar
+        if (TokenIzer.conditionOperation.includes(this.twoChar)){
+            this.advance()
+            this.advance()
+            return new Token("conditionOperation", this.twoChar)
+        }
         this.advance()
         return new Token("operatorValue", op)
     }

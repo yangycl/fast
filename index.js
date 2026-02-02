@@ -16,15 +16,27 @@ class TokenIzer {
         "el",
         "eif",
     ];
+    static conditionOperation = [
+        "==",
+        "!=",
+        "<=",
+        ">="
+    ];
     pos = 0;
     currentChar = "";
+    twoChar = "";
+    get nextChar() {
+        return this.code[this.pos + 1] ?? "";
+    }
     constructor(code) {
         this.code = code;
         this.currentChar = code[0] ?? "";
+        this.twoChar = this.currentChar + this.nextChar;
     }
     advance() {
         this.pos++;
         this.currentChar = this.code[this.pos] ?? "";
+        this.twoChar = this.currentChar + this.nextChar;
     }
     number() {
         let result = "";
@@ -58,6 +70,11 @@ class TokenIzer {
     }
     operator() {
         const op = this.currentChar;
+        if (TokenIzer.conditionOperation.includes(this.twoChar)) {
+            this.advance();
+            this.advance();
+            return new Token("conditionOperation", this.twoChar);
+        }
         this.advance();
         return new Token("operatorValue", op);
     }
