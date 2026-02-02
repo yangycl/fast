@@ -1,68 +1,104 @@
-class Token{
-    constructor (public type:string, public value:string) {}
+class Token {
+    constructor(public type: string, public value: string) {}
 }
 
-class TokenIzer{
-    public pos: number = 0       // 當前讀取位置
+class TokenIzer {
+    public pos: number = 0
     public currentChar: string = ""
 
-    constructor (public code:string){}
-    advance():void{
-        this.pos ++;
-        this.currentChar = this.currentChar = this.code[this.pos] ?? "";
+    constructor(public code: string) {
+        this.currentChar = code[0] ?? ""
     }
 
-    segmentation(code = this.code):string[]{
-        return code.split(/\s+/);
+    advance(): void {
+        this.pos++
+        this.currentChar = this.code[this.pos] ?? ""
     }
 
-    private number(codestr:string):Token{
-        return new Token("numberValue", codestr)
-    }
-    
-    private string(codestr:string){
-        return new Token("stringValue", codestr);
-    }
-
-    private identifier (codestr:string){
-        return new Token("identifierValue", codestr);
-    }  
-    private operator(codestr:string){
-        return new Token("operatorValue", codestr);
+    private number(): Token {
+        let result = ""
+        while (/\d/.test(this.currentChar)) {
+            result += this.currentChar
+            this.advance()
+        }
+        return new Token("numberValue", result)
     }
 
-    private EOF(codestr:string){
-        return new Token("EOFValue", codestr);
+    private identifier(): Token {
+        let result = ""
+        while (/[a-zA-Z]/.test(this.currentChar)) {
+            result += this.currentChar
+            this.advance()
+        }
+        return new Token("identifierValue", result)
     }
 
+    private string(): Token {
+        const quote = this.currentChar
+        let result = ""
+        this.advance() // skip opening quote
 
-    tokenize(): Token[] {
-        const codeArr = this.segmentation();
-        const tokenArr: Token[] = [];
-
-        for (let codeUnit of codeArr) {
-            if (/^\d+(\.\d+)?$/.test(codeUnit)) {
-                tokenArr.push(this.number(codeUnit));
-            }
-            else if (/^'.*'$/.test(codeUnit) || /^".*"$/.test(codeUnit)) {
-                tokenArr.push(this.string(codeUnit));
-            }
-            else if (/^[a-zA-Z]+$/.test(codeUnit)) {
-                tokenArr.push(this.identifier(codeUnit));
-            }
-            else if (/^[+\-*/]$/.test(codeUnit)) {
-                tokenArr.push(this.operator(codeUnit));
-            }
-            else {
-                if(/\+|-|\*|\//.test(codeUnit))
-                    tokenArr.push(this.operator(codeUnit));
-            }
+        while (this.currentChar !== quote && this.currentChar !== "") {
+            result += this.currentChar
+            this.advance()
         }
 
-        tokenArr.push(this.EOF("")); // 最後加 EOF
-        console.log(tokenArr)
-        return tokenArr;
+        this.advance() // skip closing quote
+        return new Token("stringValue", result)
     }
 
+    private operator(): Token {
+        const op = this.currentChar
+        this.advance()
+        return new Token("operatorValue", op)
+    }
+
+    private EOF(): Token {
+        return new Token("EOFValue", "")
+    }
+
+    tokenize(): Token[] {
+        const tokenArr: Token[] = []
+
+        while (this.currentChar !== "") {
+
+            // 跳過空白
+            if (/\s/.test(this.currentChar)) {
+                this.advance()
+                continue
+            }
+
+            // 數字
+            if (/\d/.test(this.currentChar)) {
+                tokenArr.push(this.number())
+                continue
+            }
+
+            // 字串
+            if (this.currentChar === '"' || this.currentChar === "'") {
+                tokenArr.push(this.string())
+                continue
+            }
+
+            // 識別字
+            if (/[a-zA-Z]/.test(this.currentChar)) {
+                tokenArr.push(this.identifier())
+                continue
+            }
+
+            // 運算符
+            if ("+-*/".includes(this.currentChar)) {
+                tokenArr.push(this.operator())
+                continue
+            }
+
+            throw new Error("Unknown character: " + this.currentChar)
+        }
+
+        tokenArr.push(this.EOF())
+        return tokenArr
+    }
 }
-let token:Token[] = new TokenIzer("1 + 5").tokenize()
+
+let token: Token[] = new TokenIzer("1 + 5").tokenize()
+console.log(token)
