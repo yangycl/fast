@@ -93,7 +93,13 @@ class TokenIzer {
         const tokenArr: Token[] = []
 
         while (this.currentChar !== "") {
-
+            // 大括號
+            if (this.currentChar === "{" || this.currentChar === "}") {
+                tokenArr.push(new Token("bracket", this.currentChar))
+                this.advance()
+                continue
+            }
+            
             // 跳過空白
             if (/\s/.test(this.currentChar)) {
                 this.advance()
