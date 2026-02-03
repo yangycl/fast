@@ -76,9 +76,10 @@ class TokenIzer {
     private operator(): Token {
         const op = this.currentChar
         if (TokenIzer.conditionOperation.includes(this.twoChar)){
+            const op = this.twoChar  // 先存 "=="
+            this.advance()           // 移動不會影響 op 了
             this.advance()
-            this.advance()
-            return new Token("conditionOperation", this.twoChar)
+            return new Token("conditionOperation", op)
         }
         this.advance()
         return new Token("operatorValue", op)
