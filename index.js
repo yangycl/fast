@@ -116,12 +116,16 @@ class TokenIzer {
                 tokenArr.push(this.operator());
                 continue;
             }
+            if ("+-*/<>".includes(this.currentChar)) {
+                tokenArr.push(this.operator());
+                continue;
+            }
             throw new Error("Unknown character: " + this.currentChar);
         }
         tokenArr.push(this.EOF());
         return tokenArr;
     }
 }
-let token = new TokenIzer("1 + 5").tokenize();
+let token = new TokenIzer("if a < b{}").tokenize();
 console.log(token);
 //# sourceMappingURL=index.js.map

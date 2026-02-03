@@ -129,6 +129,11 @@ class TokenIzer {
                 tokenArr.push(this.operator())
                 continue
             }
+            
+            if ("+-*/<>".includes(this.currentChar)) {
+                tokenArr.push(this.operator())
+                continue
+            }
 
             throw new Error("Unknown character: " + this.currentChar)
         }
@@ -138,5 +143,5 @@ class TokenIzer {
     }
 }
 
-let token: Token[] = new TokenIzer("1 + 5").tokenize()
+let token: Token[] = new TokenIzer("if a < b{}").tokenize()
 console.log(token)
